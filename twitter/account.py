@@ -34,7 +34,7 @@ if platform.system() != 'Windows':
 
 class Account:
 
-    def __init__(self, email: str = None, username: str = None, password: str = None, session: Client = None, **kwargs):
+    def __init__(self, email: str = None, username: str = None, password: str = None, session: Client = None, proxies: str = "", **kwargs):
         self.save = kwargs.get('save', True)
         self.debug = kwargs.get('debug', 0)
         self.gql_api = 'https://twitter.com/i/api/graphql'
@@ -42,6 +42,7 @@ class Account:
         self.v2_api = 'https://twitter.com/i/api/2'
         self.logger = self._init_logger(**kwargs)
         self.session = self._validate_session(email, username, password, session, **kwargs)
+        self.proxy = proxies
 
     def gql(self, method: str, operation: tuple, variables: dict, features: dict = Operation.default_features) -> dict:
         qid, op = operation
@@ -58,6 +59,7 @@ class Account:
             method=method,
             url=f'{self.gql_api}/{qid}/{op}',
             headers=get_headers(self.session),
+            proxies=self.proxy,
             **data
         )
         if self.debug:
